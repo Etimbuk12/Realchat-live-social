@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>RealChat Live – OX-Bridge Technology</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root{
+  --primary:#00d4ff;--accent:#ff6b35;--accent2:#7c3aed;
+  --bg:#080c14;--bg2:#0d1320;--card:#141e2e;--card2:#1a2640;
+  --border:rgba(0,212,255,0.12);--text:#e8f4f8;--text2:#8fafc0;--text3:#4a6572;
+  --success:#00e676;--danger:#ff4757;--warn:#ffb300;
+  --font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;
+  --radius:16px;--radius-sm:10px;--shadow:0 8px 32px rgba(0,0,0,0.4);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:var(--font-body);background:var(--bg);color:var(--text);overflow:hidden}
+.hidden{display:none!important}
+.screen{width:100%;height:100vh}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:#0099bb;border-radius:4px}
+
+/* ── SPLASH ── */
+#splash{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity 0.4s}
+.splash-glow{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(0,212,255,0.08),transparent 70%);animation:pulseGlow 3s ease-in-out infinite}
+@keyframes pulseGlow{0%,100%{opacity:.5}50%{opacity:1}}
+.splash-content{display:flex;flex-direction:column;align-items:center;gap:16px;animation:fadeUp 0.6s ease;position:relative;z-index:1}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.logo-ring{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent2));display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(0,212,255,0.4);animation:ringPulse 2s ease-in-out infinite}
+@keyframes ringPulse{0%,100%{box-shadow:0 0 40px rgba(0,212,255,0.4)}50%{box-shadow:0 0 70px rgba(0,212,255,0.8)}}
+.logo-ring.sm{width:46px;height:46px;animation:none;flex-shrink:0}
+.logo-ring.xs{width:34px;height:34px;animation:none;flex-shrink:0}
+.logo-inner{color:#fff;font-size:1.6rem;display:flex;align-items:center;justify-content:center}
+.logo-ring.sm .logo-inner{font-size:1rem}
+.logo-ring.xs .logo-inner{font-size:0.8rem}
+.splash-title{font-family:var(--font-head);font-size:2.5rem;font-weight:800;letter-spacing:-1px;color:#fff}
+.splash-title span,.brand span,h2 span{color:var(--primary)}
+.splash-sub{color:var(--text2);font-size:0.8rem;letter-spacing:2px;text-transform:uppercase}
+.splash-bar{width:160px;height:3px;background:var(--card2);border-radius:99px;overflow:hidden;margin-top:8px}
+.splash-bar-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent2));border-radius:99px;animation:barFill 2.8s ease forwards}
+@keyframes barFill{from{width:0}to{width:100%}}
+
+/* ── AUTH ── */
+#auth-screen{display:flex;align-items:center;justify-content:center;padding:16px;position:relative;overflow:hidden;min-height:100vh}
+.auth-bg{position:absolute;inset:0;pointer-events:none}
+.blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:0.15}
+.blob1{width:300px;height:300px;background:var(--primary);top:-100px;right:-80px}
+.blob2{width:250px;height:250px;background:var(--accent2);bottom:-80px;left:-60px}
+.blob3{width:180px;height:180px;background:var(--accent);top:40%;left:50%;transform:translateX(-50%)}
+.auth-card{width:100%;max-width:400px;background:var(--card);border:1px solid var(--border);border-radius:24px;padding:28px 22px;box-shadow:var(--shadow);position:relative;z-index:1;animation:fadeUp 0.5s ease;max-height:95vh;overflow-y:auto}
+.auth-logo{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+.auth-logo h2{font-family:var(--font-head);font-size:1.3rem;font-weight:800;color:#fff}
+.auth-logo p{font-size:0.7rem;color:var(--text2)}
+.tabs{display:flex;gap:4px;background:var(--bg2);border-radius:10px;padding:4px;margin-bottom:18px}
+.tab-btn{flex:1;padding:9px;border:none;background:transparent;color:var(--text2);border-radius:7px;font-family:var(--font-body);font-size:0.88rem;font-weight:500;cursor:pointer;transition:all 0.2s}
+.tab-btn.active{background:var(--primary);color:var(--bg);font-weight:700}
+.tab-pane{display:none;flex-direction:column;gap:11px}
+.tab-pane.active{display:flex}
+.igroup{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:11px 13px;transition:border-color 0.2s}
+.igroup:focus-within{border-color:var(--primary)}
+.igroup i{color:var(--text3);font-size:0.85rem;flex-shrink:0;width:16px;text-align:center}
+.igroup input,.igroup select,.igroup textarea{flex:1;background:none;border:none;outline:none;color:var(--text);font-family:var(--font-body);font-size:0.88rem}
+.igroup input::placeholder,.igroup textarea::placeholder{color:var(--text3)}
+.igroup select option{background:var(--bg2);color:var(--text)}
+.igroup textarea{resize:none;min-height:60px;line-height:1.4}
+.eye{cursor:pointer;color:var(--text3)}
+.btn-main{width:100%;padding:13px;background:linear-gradient(135deg,var(--primary),var(--accent2));color:#fff;border:none;border-radius:var(--radius-sm);font-family:var(--font-body);font-size:0.92rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity 0.2s,transform 0.1s}
+.btn-main:active{transform:scale(0.98);opacity:0.88}
+.btn-main:disabled{opacity:0.55;cursor:not-allowed}
+.divider{display:flex;align-items:center;gap:12px;color:var(--text3);font-size:0.78rem}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.btn-google{width:100%;padding:11px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font-body);font-size:0.88rem;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px}
+.btn-google img{width:17px;height:17px}
+.auth-foot{text-align:center;color:var(--text3);font-size:0.68rem;margin-top:14px}
+
+/* ── APP SHELL ── */
+#app-screen{display:flex;height:100vh;overflow:hidden}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:268px;background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:500;transform:translateX(-100%);transition:transform 0.3s cubic-bezier(.4,0,.2,1);padding:18px 14px}
+.sidebar.open{transform:translateX(0)}
+.sb-head{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.brand{font-family:var(--font-head);font-size:0.95rem;font-weight:700;flex:1;color:#fff}
+#close-sb{background:none;border:none;color:var(--text2);font-size:1.1rem;cursor:pointer;padding:4px}
+.sb-user{display:flex;align-items:center;gap:11px;background:var(--card2);border-radius:var(--radius-sm);padding:11px;margin-bottom:18px;border:1px solid var(--border);cursor:pointer}
+.sb-user:hover{border-color:var(--primary)}
+.sb-user-info strong{display:block;font-size:0.87rem;color:var(--text)}
+.online{font-size:0.7rem;color:var(--success)}
+.sb-nav{display:flex;flex-direction:column;gap:3px;flex:1}
+.nav-btn{display:flex;align-items:center;gap:12px;padding:11px 13px;background:none;border:none;color:var(--text2);font-family:var(--font-body);font-size:0.88rem;font-weight:500;border-radius:var(--radius-sm);cursor:pointer;transition:all 0.2s;text-align:left;width:100%}
+.nav-btn:hover{background:var(--card2);color:var(--text)}
+.nav-btn.active{background:rgba(0,212,255,0.1);color:var(--primary)}
+.nav-btn i{width:17px;text-align:center;font-size:0.9rem}
+.badge{margin-left:auto;color:#fff;font-size:0.62rem;font-weight:700;padding:2px 7px;border-radius:99px}
+.badge-red{background:var(--danger)}
+.badge-pur{background:var(--accent2)}
+.badge-live{background:var(--accent)}
+.btn-logout{display:flex;align-items:center;gap:10px;padding:11px 13px;background:rgba(255,71,87,0.1);border:1px solid rgba(255,71,87,0.2);border-radius:var(--radius-sm);color:var(--danger);font-family:var(--font-body);font-size:0.88rem;cursor:pointer;margin-top:8px;width:100%}
+.sb-foot{text-align:center;color:var(--text3);font-size:0.65rem;margin-top:12px;line-height:1.7}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(3px);z-index:400}
+
+/* ── TOPBAR ── */
+#main{flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden;min-width:0}
+.topbar{display:flex;align-items:center;gap:12px;padding:13px 15px;background:var(--card);border-bottom:1px solid var(--border);flex-shrink:0}
+#open-sb{background:none;border:none;color:var(--text);font-size:1.2rem;cursor:pointer;padding:4px}
+.page-title{font-family:var(--font-head);font-size:1.05rem;font-weight:700;flex:1}
+.av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent2));display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:0.9rem;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;cursor:pointer}
+.av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.av.sm{width:30px;height:30px;font-size:0.78rem}
+.av.lg{width:44px;height:44px;font-size:1.1rem}
+.av.xl{width:78px;height:78px;font-size:1.8rem;border:3px solid var(--card)}
+
+/* ── PAGES ── */
+.page{flex:1;overflow-y:auto;padding:15px;display:none;min-height:0}
+.page.active{display:block}
+
+/* ── HOME FEED ── */
+.composer{display:flex;gap:11px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:12px}
+.composer-box{flex:1;display:flex;flex-direction:column;gap:9px}
+.composer-box textarea{background:none;border:none;outline:none;color:var(--text);font-family:var(--font-body);font-size:0.9rem;resize:none;min-height:65px;line-height:1.5}
+.composer-box textarea::placeholder{color:var(--text3)}
+.composer-actions{display:flex;align-items:center;justify-content:space-between}
+.icon-btn{background:none;border:none;color:var(--primary);font-size:1.05rem;cursor:pointer;padding:5px}
+.btn-send{display:flex;align-items:center;gap:7px;padding:8px 16px;background:linear-gradient(135deg,var(--primary),var(--accent2));color:#fff;border:none;border-radius:99px;font-family:var(--font-body);font-size:0.83rem;font-weight:600;cursor:pointer;transition:opacity 0.2s,transform 0.1s}
+.btn-send:active{transform:scale(0.96)}
+.feed-filters{display:flex;gap:7px;margin-bottom:11px}
+.filter-btn{padding:6px 15px;background:var(--card);border:1px solid var(--border);border-radius:99px;color:var(--text2);font-family:var(--font-body);font-size:0.8rem;cursor:pointer}
+.filter-btn.active{background:var(--primary);color:var(--bg);border-color:var(--primary);font-weight:600}
+.posts-list{display:flex;flex-direction:column;gap:11px}
+.empty-state{text-align:center;color:var(--text3);padding:40px 20px;font-size:0.88rem}
+.empty-state i{font-size:2.5rem;margin-bottom:12px;display:block;opacity:0.4}
+
+/* POST CARD */
+.post-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;animation:fadeUp 0.3s ease}
+.post-head{display:flex;align-items:center;gap:10px;padding:13px 13px 0}
+.post-info{flex:1}
+.post-author{font-weight:600;font-size:0.88rem;color:var(--text)}
+.post-time{font-size:0.72rem;color:var(--text3)}
+.post-menu{background:none;border:none;color:var(--text3);cursor:pointer;padding:4px 8px;border-radius:6px;font-size:0.85rem}
+.post-menu:hover{color:var(--text);background:var(--card2)}
+.post-body{padding:10px 13px}
+.post-text{font-size:0.9rem;line-height:1.6;color:var(--text);margin-bottom:8px}
+.post-img{width:100%;max-height:280px;object-fit:cover;border-radius:10px;margin-bottom:8px;display:block}
+.post-actions{display:flex;padding:0 8px 8px;gap:4px;border-top:1px solid var(--border);padding-top:8px;margin-top:4px}
+.action-btn{display:flex;align-items:center;gap:5px;background:none;border:none;color:var(--text3);font-family:var(--font-body);font-size:0.8rem;cursor:pointer;padding:6px 10px;border-radius:8px;transition:all 0.2s;flex:1;justify-content:center}
+.action-btn:hover{background:var(--card2);color:var(--text)}
+.action-btn.liked{color:var(--danger)}
+.action-btn.liked i{color:var(--danger)}
+.action-btn .count{font-size:0.78rem}
+/* Comments section */
+.comments-section{border-top:1px solid var(--border);padding:10px 13px;display:none}
+.comments-section.open{display:block}
+.comment-item{display:flex;gap:8px;margin-bottom:10px;animation:fadeUp 0.2s ease}
+.comment-bubble{background:var(--bg2);border-radius:12px;padding:8px 12px;flex:1}
+.comment-author{font-size:0.75rem;font-weight:600;color:var(--primary);margin-bottom:2px}
+.comment-text{font-size:0.82rem;color:var(--text);line-height:1.4}
+.comment-time{font-size:0.68rem;color:var(--text3);margin-top:3px}
+.comment-input-row{display:flex;gap:8px;margin-top:8px}
+.comment-input-row input{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:99px;padding:9px 14px;color:var(--text);font-family:var(--font-body);font-size:0.83rem;outline:none}
+.comment-input-row input:focus{border-color:var(--primary)}
+.comment-input-row button{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent2));border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* ── ROOMS ── */
+.rooms-wrap{display:flex;height:calc(100vh - 55px);overflow:hidden}
+.rooms-panel{width:100%;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;min-height:0}
+.rooms-head{display:flex;align-items:center;justify-content:space-between;padding:14px;border-bottom:1px solid var(--border)}
+.rooms-head h3{font-family:var(--font-head);font-size:0.95rem}
+.circ-btn{width:32px;height:32px;border-radius:50%;background:rgba(0,212,255,0.1);border:1px solid var(--border);color:var(--primary);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.85rem}
+#rooms-list{overflow-y:auto;flex:1;padding:7px}
+.room-row{display:flex;align-items:center;gap:11px;padding:11px;border-radius:var(--radius-sm);cursor:pointer;transition:background 0.2s;border:1px solid transparent}
+.room-row:hover{background:var(--card2)}
+.room-row.active{background:rgba(0,212,255,0.08);border-color:var(--border)}
+.room-icon{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,rgba(0,212,255,0.2),rgba(124,58,237,0.2));border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--primary);flex-shrink:0}
+.room-meta{flex:1;min-width:0}
+.room-name{font-weight:600;font-size:0.88rem;color:var(--text)}
+.room-desc{font-size:0.73rem;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.live-dot{font-size:0.62rem;font-weight:700;color:var(--danger);display:flex;align-items:center;gap:3px}
+.live-dot::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--danger);animation:blink 1s infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+.chat-win{display:none;flex-direction:column;flex:1;overflow:hidden;min-height:0}
+.chat-win.open{display:flex}
+.chat-empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text3);gap:10px;font-size:0.88rem}
+.chat-topbar{display:flex;align-items:center;gap:11px;padding:13px 14px;border-bottom:1px solid var(--border);background:var(--card)}
+.back-btn{background:none;border:none;color:var(--text2);cursor:pointer;font-size:0.95rem;padding:3px}
+.chat-room-info{flex:1}
+.chat-room-info strong{display:block;font-size:0.88rem}
+.chat-room-info small{color:var(--text3);font-size:0.7rem}
+.live-badge{font-size:0.68rem;font-weight:700;color:var(--danger);display:flex;align-items:center;gap:3px;border:1px solid rgba(255,71,87,0.3);padding:3px 7px;border-radius:99px}
+.chat-msgs{flex:1;overflow-y:auto;padding:11px;display:flex;flex-direction:column;gap:7px;min-height:0}
+.chat-msg{display:flex;gap:7px;align-items:flex-end;animation:fadeUp 0.2s ease}
+.chat-msg.me{flex-direction:row-reverse}
+.bubble{max-width:74%;padding:9px 13px;border-radius:17px;font-size:0.86rem;line-height:1.5}
+.chat-msg:not(.me) .bubble{background:var(--card2);border-bottom-left-radius:3px;color:var(--text)}
+.chat-msg.me .bubble{background:linear-gradient(135deg,var(--primary),var(--accent2));color:#fff;border-bottom-right-radius:3px}
+.msg-name{font-size:0.68rem;color:var(--text3);margin-bottom:2px}
+.msg-time{font-size:0.65rem;color:var(--text3);margin-top:2px}
+.chat-bar{display:flex;gap:7px;padding:11px;border-top:1px solid var(--border);background:var(--card);flex-shrink:0}
+.chat-bar input{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:99px;padding:9px 15px;color:var(--text);font-family:var(--font-body);font-size:0.88rem;outline:none}
+.chat-bar input:focus{border-color:var(--primary)}
+
+/* ── AI ── */
+.ai-wrap{display:flex;flex-direction:column;height:calc(100vh - 55px);background:var(--bg2);overflow:hidden}
+.ai-head{display:flex;align-items:center;gap:13px;padding:14px;background:var(--card);border-bottom:1px solid var(--border)}
+.ai-icon{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--primary));display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:#fff;position:relative;flex-shrink:0}
+.ai-pulse{position:absolute;top:-1px;right:-1px;width:11px;height:11px;border-radius:50%;background:var(--success);border:2px solid var(--card)}
+.ai-head h3{font-family:var(--font-head);font-size:0.93rem}
+.ai-head p{font-size:0.7rem;color:var(--text3)}
+.ai-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:13px;min-height:0}
+.ai-msg{display:flex;gap:9px;align-items:flex-end;animation:fadeUp 0.3s ease}
+.ai-msg.user{flex-direction:row-reverse}
+.ai-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--primary));display:flex;align-items:center;justify-content:center;font-size:0.8rem;color:#fff;flex-shrink:0}
+.ai-bubble{max-width:80%;padding:11px 15px;border-radius:17px;font-size:0.88rem;line-height:1.6}
+.ai-msg.bot .ai-bubble{background:var(--card);border:1px solid var(--border);border-bottom-left-radius:3px;color:var(--text)}
+.ai-msg.user .ai-bubble{background:linear-gradient(135deg,var(--primary),var(--accent2));color:#fff;border-bottom-right-radius:3px}
+.typing-dots{display:flex;gap:4px;align-items:center;padding:4px 0}
+.typing-dots span{width:6px;height:6px;border-radius:50%;background:var(--text3);animation:typeDot 1.2s infinite}
+.typing-dots span:nth-child(2){animation-delay:0.2s}
+.typing-dots span:nth-child(3){animation-delay:0.4s}
+@keyframes typeDot{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.ai-bar{display:flex;gap:8px;padding:11px 14px;border-top:1px solid var(--border);background:var(--card);flex-shrink:0}
+.ai-bar input{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:99px;padding:10px 15px;color:var(--text);font-family:var(--font-body);font-size:0.88rem;outline:none}
+.ai-bar input:focus{border-color:var(--primary)}
+
+/* ── PROFILE ── */
+.profile-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:14px}
+.profile-cover{height:95px;background:linear-gradient(135deg,var(--accent2),var(--primary),var(--accent))}
+.profile-body{padding:0 18px 18px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.av-wrap{position:relative;margin-top:-38px;margin-bottom:10px;cursor:pointer}
+.av-wrap:hover .av-overlay{opacity:1}
+.av-overlay{position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;color:#fff;font-size:0.8rem;opacity:0;transition:opacity 0.2s;pointer-events:none}
+.online-badge{position:absolute;bottom:0;right:-2px;font-size:0.62rem;color:var(--success);background:var(--card);padding:2px 5px;border-radius:99px;border:1px solid var(--border)}
+#profile-name{font-family:var(--font-head);font-size:1.25rem;margin-bottom:3px}
+.profile-email-text{color:var(--text3);font-size:0.78rem;margin-bottom:14px}
+.profile-stats{display:flex;gap:22px;margin-bottom:14px}
+.stat{display:flex;flex-direction:column;align-items:center}
+.stat strong{font-family:var(--font-head);font-size:1.2rem;color:var(--primary)}
+.stat span{font-size:0.72rem;color:var(--text3)}
+.profile-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.btn-outline{padding:9px 18px;background:none;border:1px solid var(--border);border-radius:99px;color:var(--text2);font-family:var(--font-body);font-size:0.83rem;cursor:pointer}
+.btn-outline:hover{border-color:var(--primary);color:var(--primary)}
+
+/* ── PEOPLE ── */
+.people-grid{display:flex;flex-direction:column;gap:10px}
+.person-card{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:13px}
+.person-info{flex:1}
+.person-name{font-weight:600;font-size:0.88rem;color:var(--text)}
+.person-email{font-size:0.73rem;color:var(--text3)}
+.follow-btn{padding:7px 15px;border-radius:99px;font-family:var(--font-body);font-size:0.78rem;font-weight:600;cursor:pointer;border:1px solid var(--primary);color:var(--primary);background:transparent;transition:all 0.2s}
+.follow-btn.following{background:var(--primary);color:var(--bg)}
+
+/* ── ADMIN ── */
+.admin-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;text-align:center}
+.stat-card .num{font-family:var(--font-head);font-size:1.8rem;font-weight:800;color:var(--primary)}
+.stat-card .lbl{font-size:0.73rem;color:var(--text3);margin-top:3px}
+.admin-section{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:12px}
+.admin-section h3{font-family:var(--font-head);font-size:0.92rem;margin-bottom:12px;color:var(--primary);display:flex;align-items:center;gap:8px}
+.user-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.user-row:last-child{border-bottom:none}
+.user-row-info{flex:1}
+.user-row-name{font-size:0.85rem;font-weight:600;color:var(--text)}
+.user-row-email{font-size:0.72rem;color:var(--text3)}
+.btn-danger{padding:5px 12px;background:rgba(255,71,87,0.15);border:1px solid rgba(255,71,87,0.3);border-radius:7px;color:var(--danger);font-family:var(--font-body);font-size:0.75rem;cursor:pointer}
+
+/* ── MODAL ── */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);z-index:800;display:flex;align-items:center;justify-content:center;padding:18px}
+.modal-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:22px;width:100%;max-width:360px;display:flex;flex-direction:column;gap:13px;animation:fadeUp 0.3s ease;max-height:90vh;overflow-y:auto}
+.modal-card h3{font-family:var(--font-head);font-size:0.95rem;color:var(--primary);display:flex;align-items:center;gap:8px}
+.modal-actions{display:flex;gap:9px}
+.modal-actions .btn-outline{flex:1}
+.modal-actions .btn-main{flex:1;width:auto}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--border);color:var(--text);padding:11px 20px;border-radius:99px;font-size:0.83rem;z-index:9000;box-shadow:var(--shadow);white-space:nowrap;animation:toastIn 0.3s ease;max-width:90vw;text-align:center}
+.toast.ok{border-color:var(--success);color:var(--success)}
+.toast.err{border-color:var(--danger);color:var(--danger)}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,18px)}to{opacity:1;transform:translate(-50%,0)}}
+
+/* ── IMAGE PREVIEW ── */
+.img-preview{position:relative;margin-bottom:10px}
+.img-preview img{width:100%;max-height:180px;object-fit:cover;border-radius:10px;border:1px solid var(--border)}
+.img-preview .rm-img{position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.7);border:none;color:#fff;border-radius:50%;width:26px;height:26px;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center}
+
+@media(min-width:768px){
+  .sidebar{position:relative;transform:translateX(0);width:255px;flex-shrink:0}
+  #close-sb,#open-sb{display:none}
+  .overlay{display:none!important}
+  .rooms-panel{width:230px;flex-shrink:0}
+  .chat-win{display:flex!important}
+}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="splash-glow"></div>
+  <div class="splash-content">
+    <div class="logo-ring"><div class="logo-inner"><i class="fa-solid fa-bolt"></i></div></div>
+    <h1 class="splash-title">RealChat<span>Live</span></h1>
+    <p class="splash-sub">Powered by OX-Bridge Technology</p>
+    <div class="splash-bar"><div class="splash-bar-fill"></div></div>
+  </div>
+</div>
+
+<!-- AUTH -->
+<div id="auth-screen" class="screen hidden">
+  <div class="auth-bg"><div class="blob blob1"></div><div class="blob blob2"></div><div class="blob blob3"></div></div>
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="logo-ring sm"><div class="logo-inner"><i class="fa-solid fa-bolt"></i></div></div>
+      <div><h2>RealChat<span>Live</span></h2><p>OX-Bridge Technology</p></div>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="login">Sign In</button>
+      <button class="tab-btn" data-tab="reg">Sign Up</button>
+    </div>
+    <div id="tab-login" class="tab-pane active">
+      <div class="igroup"><i class="fa-solid fa-envelope"></i><input type="email" id="li-email" placeholder="Email address"/></div>
+      <div class="igroup"><i class="fa-solid fa-lock"></i><input type="password" id="li-pw" placeholder="Password"/><i class="fa-solid fa-eye eye" id="li-eye"></i></div>
+      <button class="btn-main" id="btn-login"><i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In</button>
+      <div class="divider"><span>or</span></div>
+      <button class="btn-google" id="btn-glogin"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="G"/>Continue with Google</button>
+    </div>
+    <div id="tab-reg" class="tab-pane">
+      <div class="igroup"><i class="fa-solid fa-user"></i><input type="text" id="reg-name" placeholder="Your name"/></div>
+      <div class="igroup"><i class="fa-solid fa-envelope"></i><input type="email" id="reg-email" placeholder="Email address"/></div>
+      <div class="igroup"><i class="fa-solid fa-lock"></i><input type="password" id="reg-pw" placeholder="Password (min 6)"/><i class="fa-solid fa-eye eye" id="reg-eye"></i></div>
+      <button class="btn-main" id="btn-reg"><i class="fa-solid fa-user-plus"></i> Create Account</button>
+      <div class="divider"><span>or</span></div>
+      <button class="btn-google" id="btn-greg"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="G"/>Continue with Google</button>
+    </div>
+    <p class="auth-foot">© 2025 OX-Bridge Technology · Founded by Goodnews Solomon</p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app-screen" class="screen hidden">
+  <aside id="sidebar" class="sidebar">
+    <div class="sb-head">
+      <div class="logo-ring xs"><div class="logo-inner"><i class="fa-solid fa-bolt"></i></div></div>
+      <span class="brand">RealChat<span>Live</span></span>
+      <button id="close-sb"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="sb-user" id="sb-user-card">
+      <div class="av" id="sb-av">U</div>
+      <div class="sb-user-info"><strong id="sb-name">...</strong><span class="online">● Online</span></div>
+    </div>
+    <nav class="sb-nav">
+      <button class="nav-btn active" data-page="home"><i class="fa-solid fa-house"></i> Home Feed</button>
+      <button class="nav-btn" data-page="rooms"><i class="fa-solid fa-comments"></i> Chat Rooms <span class="badge badge-live">LIVE</span></button>
+      <button class="nav-btn" data-page="ai"><i class="fa-solid fa-robot"></i> OX-Bridge AI <span class="badge badge-pur">AI</span></button>
+      <button class="nav-btn" data-page="people"><i class="fa-solid fa-users"></i> People</button>
+      <button class="nav-btn" data-page="profile"><i class="fa-solid fa-circle-user"></i> My Profile</button>
+      <button class="nav-btn" data-page="admin" id="admin-nav-btn" style="display:none"><i class="fa-solid fa-shield-halved"></i> Admin <span class="badge badge-red">ADMIN</span></button>
+    </nav>
+    <button class="btn-logout" id="btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+    <p class="sb-foot">OX-Bridge Technology<br/>Founded by OX-Bridge</p>
+  </aside>
+  <div id="sb-overlay" class="overlay hidden"></div>
+
+  <main id="main">
+    <header class="topbar">
+      <button id="open-sb"><i class="fa-solid fa-bars"></i></button>
+      <h2 class="page-title" id="page-title">Home Feed</h2>
+      <div class="av sm" id="top-av">U</div>
+    </header>
+
+    <!-- HOME -->
+    <div id="page-home" class="page active">
+      <div class="composer">
+        <div class="av" id="comp-av">U</div>
+        <div class="composer-box">
+          <textarea id="post-text" placeholder="What's on your mind? Share with everyone..."></textarea>
+          <div class="composer-actions">
+            <label class="icon-btn" for="post-img-in" title="Add photo"><i class="fa-solid fa-image"></i></label>
+            <input type="file" id="post-img-in" accept="image/*" class="hidden"/>
+            <button id="btn-post" class="btn-send"><i class="fa-solid fa-paper-plane"></i> Post</button>
+          </div>
+        </div>
+      </div>
+      <div id="post-img-preview" class="img-preview hidden"></div>
+      <div class="feed-filters">
+        <button class="filter-btn active" data-f="all">All Posts</button>
+        <button class="filter-btn" data-f="mine">My Posts</button>
+        <button class="filter-btn" data-f="following">Following</button>
+      </div>
+      <div id="posts-list" class="posts-list">
+        <div class="empty-state"><i class="fa-solid fa-circle-notch fa-spin"></i>Loading posts...</div>
+      </div>
+    </div>
+
+    <!-- ROOMS -->
+    <div id="page-rooms" class="page">
+      <div class="rooms-wrap">
+        <div class="rooms-panel" id="rooms-panel">
+          <div class="rooms-head"><h3><i class="fa-solid fa-comments"></i> Live Rooms</h3><button class="circ-btn" id="btn-new-room"><i class="fa-solid fa-plus"></i></button></div>
+          <div id="rooms-list"><div class="empty-state" style="padding:30px"><i class="fa-solid fa-circle-notch fa-spin"></i></div></div>
+        </div>
+        <div class="chat-win" id="chat-win">
+          <div class="chat-empty-state"><i class="fa-solid fa-comments fa-3x" style="opacity:0.3"></i><p>Pick a room to chat</p></div>
+          <div class="chat-topbar" id="chat-topbar" style="display:none">
+            <button class="back-btn" id="back-rooms"><i class="fa-solid fa-arrow-left"></i></button>
+            <div class="chat-room-info"><strong id="room-name-display">Room</strong><small id="room-members-display">0 online</small></div>
+            <span class="live-badge"><i class="fa-solid fa-circle" style="font-size:0.4rem;animation:blink 1s infinite"></i> LIVE</span>
+          </div>
+          <div class="chat-msgs" id="chat-msgs" style="display:none"></div>
+          <div class="chat-bar" id="chat-bar" style="display:none">
+            <input type="text" id="chat-in" placeholder="Type a message..."/>
+            <button id="btn-send-chat" class="btn-send" style="padding:9px 14px"><i class="fa-solid fa-paper-plane"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI -->
+    <div id="page-ai" class="page">
+      <div class="ai-wrap">
+        <div class="ai-head">
+          <div class="ai-icon"><i class="fa-solid fa-robot"></i><span class="ai-pulse"></span></div>
+          <div><h3>OX-Bridge AI Assistant</h3><p>Created by OX-Bridge Technology · Goodnews Solomon</p></div>
+        </div>
+        <div id="ai-msgs" class="ai-msgs">
+          <div class="ai-msg bot">
+            <div class="ai-av"><i class="fa-solid fa-robot"></i></div>
+            <div class="ai-bubble">Hey! 👋 I'm the <strong>OX-Bridge AI Assistant</strong>, created by <strong>OX-Bridge Technology</strong>, founded by <strong>Goodnews Solomon</strong>. How can I help you today?</div>
+          </div>
+        </div>
+        <div class="ai-bar">
+          <input type="text" id="ai-in" placeholder="Ask me anything..."/>
+          <button id="btn-ai" class="btn-send" style="padding:9px 14px"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PEOPLE -->
+    <div id="page-people" class="page">
+      <div class="igroup" style="margin-bottom:12px"><i class="fa-solid fa-magnifying-glass"></i><input type="text" id="search-people" placeholder="Search people..."/></div>
+      <div id="people-list" class="people-grid"><div class="empty-state"><i class="fa-solid fa-circle-notch fa-spin"></i>Loading...</div></div>
+    </div>
+
+    <!-- PROFILE -->
+    <div id="page-profile" class="page">
+      <div class="profile-card">
+        <div class="profile-cover"></div>
+        <div class="profile-body">
+          <div class="av-wrap" id="av-wrap-click">
+            <div class="av xl" id="profile-av">U</div>
+            <div class="av-overlay"><i class="fa-solid fa-camera"></i> Change</div>
+            <span class="online-badge">● Online</span>
+          </div>
+          <input type="file" id="pic-in" accept="image/*" class="hidden"/>
+          <h2 id="profile-name">Name</h2>
+          <p class="profile-email-text" id="profile-email">email</p>
+          <div class="profile-stats">
+            <div class="stat"><strong id="stat-posts">0</strong><span>Posts</span></div>
+            <div class="stat"><strong id="stat-followers">0</strong><span>Followers</span></div>
+            <div class="stat"><strong id="stat-following">0</strong><span>Following</span></div>
+          </div>
+          <div class="profile-btns">
+            <button class="btn-main" id="btn-edit-name" style="width:auto;padding:9px 20px;border-radius:99px"><i class="fa-solid fa-pen"></i> Edit Name</button>
+            <button class="btn-outline" id="btn-share-profile"><i class="fa-solid fa-share-nodes"></i> Share</button>
+          </div>
+        </div>
+      </div>
+      <div id="profile-posts" class="posts-list"></div>
+    </div>
+
+    <!-- ADMIN -->
+    <div id="page-admin" class="page">
+      <div class="admin-stats">
+        <div class="stat-card"><div class="num" id="admin-total-users">0</div><div class="lbl">Total Users</div></div>
+        <div class="stat-card"><div class="num" id="admin-total-posts">0</div><div class="lbl">Total Posts</div></div>
+        <div class="stat-card"><div class="num" id="admin-total-rooms">0</div><div class="lbl">Live Rooms</div></div>
+        <div class="stat-card"><div class="num" id="admin-total-msgs">0</div><div class="lbl">Messages</div></div>
+      </div>
+      <div class="admin-section">
+        <h3><i class="fa-solid fa-users"></i> All Users</h3>
+        <div id="admin-users-list"><div class="empty-state" style="padding:20px"><i class="fa-solid fa-circle-notch fa-spin"></i></div></div>
+      </div>
+      <div class="admin-section">
+        <h3><i class="fa-solid fa-newspaper"></i> Recent Posts</h3>
+        <div id="admin-posts-list"><div class="empty-state" style="padding:20px"><i class="fa-solid fa-circle-notch fa-spin"></i></div></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- MODALS -->
+<div id="modal-room" class="modal hidden">
+  <div class="modal-card">
+    <h3><i class="fa-solid fa-plus"></i> Create Chat Room</h3>
+    <div class="igroup"><i class="fa-solid fa-hashtag"></i><input type="text" id="new-room-name" placeholder="Room name e.g. Tech Talk"/></div>
+    <div class="igroup"><i class="fa-solid fa-align-left"></i><input type="text" id="new-room-desc" placeholder="Short description"/></div>
+    <div class="modal-actions">
+      <button class="btn-outline" id="cancel-room">Cancel</button>
+      <button class="btn-main" id="confirm-room">Create</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-edit-name" class="modal hidden">
+  <div class="modal-card">
+    <h3><i class="fa-solid fa-pen"></i> Edit Display Name</h3>
+    <div class="igroup"><i class="fa-solid fa-user"></i><input type="text" id="new-name-in" placeholder="New display name"/></div>
+    <div class="modal-actions">
+      <button class="btn-outline" id="cancel-name">Cancel</button>
+      <button class="btn-main" id="confirm-name">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+<script>
+'use strict';
+// ═══════════════════════════════════════════
+//  REALCHAT LIVE v2 — OX-Bridge Technology
+//  Founded by OX-Bridge
+// ═══════════════════════════════════════════
+
+const GROQ_KEY   = "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";
+const GROQ_MODEL = "llama-3.3-70b-versatile";
+const ADMIN_EMAIL = "goodnewssolomon@gmail.com"; // ← change to your email for admin access
+
+const FB_CFG = {
+  apiKey:"AIzaSyD0H4LIQx2ma93zGXvaj7G1o2L4PZB1rbo",
+  authDomain:"naija-hub-def3f.firebaseapp.com",
+  databaseURL:"https://naija-hub-def3f-default-rtdb.firebaseio.com",
+  projectId:"naija-hub-def3f",
+  storageBucket:"naija-hub-def3f.firebasestorage.app",
+  messagingSenderId:"559274547422",
+  appId:"1:559274547422:web:e390e8a72c173a76218a4f"
+};
+
+let auth, db;
+let CU = null; // current user
+let activeRoomId = null, roomListener = null;
+let postFilter = "all";
+let picB64 = null;
+let allUsers = {};
+const aiHistory = [{
+  role:"system",
+  content:"You are the OX-Bridge AI Assistant, built into RealChat Live social platform. You were created by OX-Bridge Technology, a company founded by Goodnews Solomon. Whenever anyone asks who created you, who made you, or who built you — always say: I was created by OX-Bridge Technology, founded by Goodnews Solomon. Be friendly, warm, helpful and conversational. Keep responses clear and helpful."
+}];
+
+try {
+  if(!firebase.apps.length) firebase.initializeApp(FB_CFG);
+  auth = firebase.auth();
+  db   = firebase.database();
+} catch(e){ console.error("FB init:",e); }
+
+// ──────────────────────────────────────────
+//  HELPERS
+// ──────────────────────────────────────────
+const G = id => document.getElementById(id);
+
+function toast(msg, type=""){
+  const t=G("toast"); if(!t)return;
+  t.textContent=msg; t.className="toast "+(type==="success"?"ok":type==="error"?"err":"");
+  t.classList.remove("hidden");
+  setTimeout(()=>t.classList.add("hidden"),3500);
+}
+
+function loading(btn, on, orig){
+  if(!btn)return;
+  btn.disabled=on;
+  btn.innerHTML=on?'<i class="fa-solid fa-circle-notch fa-spin"></i> Please wait...':orig;
+}
+
+function esc(s){
+  return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br>");
+}
+
+function timeAgo(ts){
+  if(!ts)return"";
+  const diff=Date.now()-ts, m=60000, h=3600000, d=86400000;
+  if(diff<m) return "just now";
+  if(diff<h) return Math.floor(diff/m)+"m ago";
+  if(diff<d) return Math.floor(diff/h)+"h ago";
+  return Math.floor(diff/d)+"d ago";
+}
+
+function fmtDate(ts){ return ts?new Date(ts).toLocaleDateString([],{month:"short",year:"numeric"}):"—"; }
+
+function avatarL(n){ return (String(n||"U")).charAt(0).toUpperCase(); }
+
+function setAv(el, user){
+  if(!el)return;
+  const pic = user && user.photoURL ? user.photoURL : null;
+  if(pic) el.innerHTML=`<img src="${pic}"/>`;
+  else el.textContent=avatarL(user?(user.displayName||user.email):"U");
+}
+
+function showScreen(id){
+  ["auth-screen","app-screen"].forEach(s=>{
+    const el=G(s); if(el) el.classList.add("hidden");
+  });
+  const t=G(id); if(t) t.classList.remove("hidden");
+}
+
+// ──────────────────────────────────────────
+//  SPLASH + BOOT
+// ──────────────────────────────────────────
+function hideSplash(){
+  const s=G("splash"); if(!s)return;
+  s.style.opacity="0";
+  setTimeout(()=>s.style.display="none",400);
+}
+
+const bootTimer = setTimeout(()=>{ hideSplash(); showScreen("auth-screen"); }, 3200);
+
+if(!auth){ clearTimeout(bootTimer); hideSplash(); showScreen("auth-screen"); }
+else {
+  auth.getRedirectResult().then(r=>{
+    if(r&&r.user) saveUserToDB(r.user);
+  }).catch(()=>{});
+
+  const unsub = auth.onAuthStateChanged(user=>{
+    clearTimeout(bootTimer); unsub();
+    if(user){ CU=user; hideSplash(); launchApp(); }
+    else { hideSplash(); showScreen("auth-screen"); }
+  }, ()=>{ clearTimeout(bootTimer); hideSplash(); showScreen("auth-screen"); });
+}
+
+function saveUserToDB(user){
+  db.ref("users/"+user.uid).once("value").then(snap=>{
+    if(!snap.exists()){
+      db.ref("users/"+user.uid).set({
+        name:user.displayName||"User",
+        email:user.email||"",
+        photoURL:user.photoURL||"",
+        createdAt:Date.now()
+      });
+    }
+  });
+}
+
+// ──────────────────────────────────────────
+//  DOM READY
+// ──────────────────────────────────────────
+document.addEventListener("DOMContentLoaded", ()=>{
+
+  // ── TABS ──
+  document.querySelectorAll(".tab-btn").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+      document.querySelectorAll(".tab-pane").forEach(p=>p.classList.remove("active"));
+      btn.classList.add("active");
+      const pane=G("tab-"+btn.dataset.tab); if(pane) pane.classList.add("active");
+    });
+  });
+
+  // ── EYE TOGGLES ──
+  [["li-eye","li-pw"],["reg-eye","reg-pw"]].forEach(([e,i])=>{
+    const eye=G(e),inp=G(i);
+    if(eye&&inp) eye.addEventListener("click",()=>{
+      inp.type=inp.type==="password"?"text":"password";
+      eye.classList.toggle("fa-eye"); eye.classList.toggle("fa-eye-slash");
+    });
+  });
+
+  // ── EMAIL LOGIN ──
+  const btnL=G("btn-login");
+  if(btnL) btnL.addEventListener("click",async()=>{
+    const email=G("li-email").value.trim(), pw=G("li-pw").value.trim();
+    if(!email||!pw){toast("Enter email and password","error");return;}
+    const orig=btnL.innerHTML; loading(btnL,true);
+    try{
+      await auth.signInWithEmailAndPassword(email,pw);
+      toast("Welcome back! 🎉","success");
+    }catch(e){
+      toast(e.code==="auth/wrong-password"||e.code==="auth/invalid-credential"?"Wrong email or password":
+            e.code==="auth/user-not-found"?"No account found":
+            e.code==="auth/network-request-failed"?"No internet":"Error: "+e.message,"error");
+      loading(btnL,false,orig);
+    }
+  });
+
+  // ── EMAIL REGISTER ──
+  const btnR=G("btn-reg");
+  if(btnR) btnR.addEventListener("click",async()=>{
+    const name=G("reg-name").value.trim(), email=G("reg-email").value.trim(), pw=G("reg-pw").value.trim();
+    if(!name||!email||!pw){toast("Fill in all fields","error");return;}
+    if(pw.length<6){toast("Password needs 6+ characters","error");return;}
+    const orig=btnR.innerHTML; loading(btnR,true);
+    try{
+      const cred=await auth.createUserWithEmailAndPassword(email,pw);
+      await cred.user.updateProfile({displayName:name});
+      await db.ref("users/"+cred.user.uid).set({name,email,photoURL:"",createdAt:Date.now()});
+      toast("Account created! 🚀","success");
+    }catch(e){
+      toast(e.code==="auth/email-already-in-use"?"Email already registered":
+            e.code==="auth/network-request-failed"?"No internet":"Error: "+e.message,"error");
+      loading(btnR,false,orig);
+    }
+  });
+
+  // ── GOOGLE ──
+  async function gAuth(){
+    const o1=G("btn-glogin").innerHTML, o2=G("btn-greg").innerHTML;
+    loading(G("btn-glogin"),true); loading(G("btn-greg"),true);
+    try{
+      await auth.signInWithRedirect(new firebase.auth.GoogleAuthProvider());
+    }catch(e){
+      toast("Google sign-in error: "+e.message,"error");
+      loading(G("btn-glogin"),false,o1); loading(G("btn-greg"),false,o2);
+    }
+  }
+  G("btn-glogin").addEventListener("click",gAuth);
+  G("btn-greg").addEventListener("click",gAuth);
+
+  // ── LOGOUT ──
+  G("btn-logout").addEventListener("click",async()=>{
+    await auth.signOut(); CU=null; showScreen("auth-screen"); toast("Signed out");
+  });
+
+  // ── SIDEBAR ──
+  const sbEl=G("sidebar"), ovEl=G("sb-overlay");
+  const openSB=()=>{ sbEl.classList.add("open"); ovEl.classList.remove("hidden"); };
+  const closeSB=()=>{ sbEl.classList.remove("open"); ovEl.classList.add("hidden"); };
+  G("open-sb").addEventListener("click",openSB);
+  G("close-sb").addEventListener("click",closeSB);
+  ovEl.addEventListener("click",closeSB);
+
+  // ── NAV ──
+  document.querySelectorAll(".nav-btn").forEach(btn=>{
+    btn.addEventListener("click",()=>goTo(btn.dataset.page));
+  });
+
+  // ── FEED FILTERS ──
+  document.querySelectorAll(".filter-btn").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active"); postFilter=btn.dataset.f; loadPosts();
+    });
+  });
+
+  // ── POST IMAGE ──
+  G("post-img-in").addEventListener("change",e=>{
+    const f=e.target.files[0]; if(!f)return;
+    const r=new FileReader();
+    r.onload=ev=>{
+      picB64=ev.target.result;
+      const pv=G("post-img-preview");
+      pv.innerHTML=`<img src="${picB64}"/><button class="rm-img" onclick="clearPic()">✕</button>`;
+      pv.classList.remove("hidden");
+    };
+    r.readAsDataURL(f);
+  });
+
+  // ── POST ──
+  G("btn-post").addEventListener("click",doPost);
+
+  // ── CHAT ──
+  G("btn-send-chat").addEventListener("click",sendChat);
+  G("chat-in").addEventListener("keydown",e=>{ if(e.key==="Enter"){e.preventDefault();sendChat();} });
+  G("back-rooms").addEventListener("click",()=>{
+    G("rooms-panel").style.display=""; G("chat-win").classList.remove("open");
+    activeRoomId=null;
+  });
+
+  // ── ROOM MODAL ──
+  G("btn-new-room").addEventListener("click",()=>G("modal-room").classList.remove("hidden"));
+  G("cancel-room").addEventListener("click",()=>G("modal-room").classList.add("hidden"));
+  G("confirm-room").addEventListener("click",async()=>{
+    const n=G("new-room-name").value.trim(), d=G("new-room-desc").value.trim();
+    if(!n){toast("Enter a room name","error");return;}
+    const ref=db.ref("rooms").push();
+    await ref.set({id:ref.key,name:n,desc:d,by:CU.uid,at:Date.now()});
+    G("new-room-name").value=""; G("new-room-desc").value="";
+    G("modal-room").classList.add("hidden"); toast("Room created! 🎉","success");
+  });
+
+  // ── AI ──
+  G("btn-ai").addEventListener("click",sendAI);
+  G("ai-in").addEventListener("keydown",e=>{ if(e.key==="Enter"){e.preventDefault();sendAI();} });
+
+  // ── PROFILE PIC ──
+  G("av-wrap-click").addEventListener("click",()=>G("pic-in").click());
+  G("pic-in").addEventListener("change",async e=>{
+    const f=e.target.files[0]; if(!f)return;
+    if(f.size>800000){toast("Image too large. Use under 800KB","error");return;}
+    const r=new FileReader();
+    r.onload=async ev=>{
+      const b64=ev.target.result;
+      try{
+        await CU.updateProfile({photoURL:b64});
+        await db.ref("users/"+CU.uid+"/photoURL").set(b64);
+        updateUI(); toast("Profile picture updated! 📸","success");
+      }catch(e){ toast("Failed to update picture","error"); }
+    };
+    r.readAsDataURL(f);
+  });
+
+  // ── EDIT NAME ──
+  G("btn-edit-name").addEventListener("click",()=>{
+    G("new-name-in").value=CU?(CU.displayName||""):"";
+    G("modal-edit-name").classList.remove("hidden");
+  });
+  G("cancel-name").addEventListener("click",()=>G("modal-edit-name").classList.add("hidden"));
+  G("confirm-name").addEventListener("click",async()=>{
+    const n=G("new-name-in").value.trim();
+    if(!n){toast("Enter a name","error");return;}
+    await CU.updateProfile({displayName:n});
+    await db.ref("users/"+CU.uid+"/name").set(n);
+    G("modal-edit-name").classList.add("hidden"); updateUI(); loadProfile();
+    toast("Name updated ✅","success");
+  });
+
+  // ── SHARE PROFILE ──
+  G("btn-share-profile").addEventListener("click",()=>{
+    const text=`Check out ${CU.displayName||"my"} profile on RealChat Live by OX-Bridge Technology!`;
+    if(navigator.share) navigator.share({title:"RealChat Live",text});
+    else { navigator.clipboard&&navigator.clipboard.writeText(text); toast("Profile info copied! 📋","success"); }
+  });
+
+  // ── PEOPLE SEARCH ──
+  G("search-people").addEventListener("input",e=>filterPeople(e.target.value));
+
+  // ── SIDEBAR USER CLICK → PROFILE ──
+  G("sb-user-card").addEventListener("click",()=>goTo("profile"));
+
+});// END DOMContentLoaded
+
+// ──────────────────────────────────────────
+//  APP LAUNCH
+// ──────────────────────────────────────────
+const PAGE_TITLES={home:"Home Feed",rooms:"Chat Rooms",ai:"OX-Bridge AI",people:"People",profile:"My Profile",admin:"Admin Dashboard"};
+
+function launchApp(){
+  showScreen("app-screen");
+  updateUI();
+  loadPosts();
+  loadRooms();
+  loadPeople();
+  goTo("home");
+  // Show admin nav if admin email
+  if(CU&&CU.email===ADMIN_EMAIL){
+    const ab=G("admin-nav-btn"); if(ab) ab.style.display="flex";
+  }
+}
+
+function goTo(page){
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(`.nav-btn[data-page="${page}"]`).forEach(b=>b.classList.add("active"));
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  const pg=G("page-"+page); if(pg) pg.classList.add("active");
+  const ti=G("page-title"); if(ti) ti.textContent=PAGE_TITLES[page]||page;
+  G("sidebar").classList.remove("open"); G("sb-overlay").classList.add("hidden");
+  if(page==="profile") loadProfile();
+  if(page==="admin") loadAdmin();
+}
+
+function updateUI(){
+  if(!CU)return;
+  const n=CU.displayName||CU.email||"User";
+  const sn=G("sb-name"); if(sn) sn.textContent=n;
+  setAv(G("sb-av"),CU); setAv(G("top-av"),CU); setAv(G("comp-av"),CU);
+}
+
+// ──────────────────────────────────────────
+//  POSTS — FIXED: clear list before render
+// ──────────────────────────────────────────
+function clearPic(){
+  picB64=null; G("post-img-preview").classList.add("hidden"); G("post-img-in").value="";
+}
+
+async function doPost(){
+  const txt=G("post-text").value.trim();
+  if(!txt&&!picB64){toast("Write something first!","error");return;}
+  const btn=G("btn-post"),orig=btn.innerHTML; loading(btn,true);
+  try{
+    const ref=db.ref("posts").push();
+    await ref.set({
+      id:ref.key, uid:CU.uid,
+      author:CU.displayName||CU.email||"User",
+      photoURL:CU.photoURL||"",
+      text:txt||"", image:picB64||"",
+      likes:0, likedBy:{}, comments:0,
+      createdAt:Date.now()
+    });
+    G("post-text").value=""; clearPic(); toast("Posted! 🚀","success");
+  }catch(e){ toast("Failed to post: "+e.message,"error"); }
+  loading(btn,false,orig);
+}
+
+let postsListener = null;
+function loadPosts(){
+  if(!db)return;
+  const list=G("posts-list"); if(!list)return;
+  list.innerHTML='<div class="empty-state"><i class="fa-solid fa-circle-notch fa-spin"></i>Loading...</div>';
+  if(postsListener){ db.ref("posts").off("value",postsListener); postsListener=null; }
+
+  function doRender(snap){
+    const all=[];
+    snap.forEach(c=>{ const v=c.val(); if(v&&v.id) all.unshift(v); });
+    if(postFilter==="following"){
+      db.ref("follows/"+CU.uid).once("value",fs=>{
+        const fw={}; fs.forEach(c=>{fw[c.key]=true;});
+        renderPosts(all.filter(p=>fw[p.uid]||p.uid===CU.uid));
+      });
+    } else if(postFilter==="mine"){
+      renderPosts(all.filter(p=>p.uid===CU.uid));
+    } else {
+      renderPosts(all);
+    }
+  }
+
+  // Load once immediately then keep listening for real-time updates
+  postsListener = db.ref("posts").orderByChild("createdAt").limitToLast(60).on("value", snap=>{
+    doRender(snap);
+  });
+}
+
+function renderPosts(posts){
+  const list=G("posts-list"); if(!list)return;
+  list.innerHTML="";
+  if(!posts.length){
+    list.innerHTML='<div class="empty-state"><i class="fa-regular fa-face-smile"></i>No posts yet. Be first! 🌟</div>';
+    return;
+  }
+  posts.forEach(p=>list.appendChild(buildPost(p)));
+}
+
+function buildPost(p){
+  const div=document.createElement("div");
+  div.className="post-card";
+  const mine=p.uid===CU.uid;
+  const liked=p.likedBy&&p.likedBy[CU.uid];
+  div.innerHTML=`
+    <div class="post-head">
+      <div class="av sm">${p.photoURL?`<img src="${p.photoURL}"/>`:avatarL(p.author)}</div>
+      <div class="post-info">
+        <div class="post-author">${esc(p.author||"User")}</div>
+        <div class="post-time">${timeAgo(p.createdAt)}</div>
+      </div>
+      ${mine?`<button class="post-menu del-post-btn" data-id="${p.id}"><i class="fa-solid fa-trash"></i></button>`:""}
+    </div>
+    <div class="post-body">
+      ${p.text?`<div class="post-text">${esc(p.text)}</div>`:""}
+      ${p.image?`<img class="post-img" src="${p.image}" alt="post"/>`:""}
+    </div>
+    <div class="post-actions">
+      <button class="action-btn like-btn${liked?" liked":""}" data-id="${p.id}">
+        <i class="fa-${liked?"solid":"regular"} fa-heart"></i>
+        <span class="count">${p.likes||0}</span>
+      </button>
+      <button class="action-btn comment-toggle-btn" data-id="${p.id}">
+        <i class="fa-regular fa-comment"></i>
+        <span class="count">${p.comments||0}</span>
+      </button>
+      <button class="action-btn share-btn" data-id="${p.id}" data-text="${esc(p.text||'')}">
+        <i class="fa-solid fa-share-nodes"></i> Share
+      </button>
+    </div>
+    <div class="comments-section" id="cs-${p.id}">
+      <div id="clist-${p.id}"></div>
+      <div class="comment-input-row">
+        <input type="text" id="cin-${p.id}" placeholder="Write a comment..."/>
+        <button class="send-comment-btn" data-id="${p.id}"><i class="fa-solid fa-paper-plane"></i></button>
+      </div>
+    </div>`;
+
+  // Like
+  div.querySelector(".like-btn").addEventListener("click",()=>toggleLike(p));
+  // Comment toggle
+  div.querySelector(".comment-toggle-btn").addEventListener("click",()=>toggleComments(p.id));
+  // Share
+  div.querySelector(".share-btn").addEventListener("click",()=>{
+    const txt=`Check this post on RealChat Live: "${p.text||"[image]"}" by ${p.author}`;
+    if(navigator.share) navigator.share({title:"RealChat Live",text:txt});
+    else{ navigator.clipboard&&navigator.clipboard.writeText(txt); toast("Post link copied! 📋","success"); }
+  });
+  // Delete
+  const del=div.querySelector(".del-post-btn");
+  if(del) del.addEventListener("click",()=>delPost(p.id));
+  // Send comment
+  div.querySelector(".send-comment-btn").addEventListener("click",()=>{
+    const cin=G("cin-"+p.id); if(cin) sendComment(p.id,cin);
+  });
+  G("cin-"+p.id) && div.querySelector("#cin-"+p.id) && div.querySelector("#cin-"+p.id).addEventListener("keydown",e=>{
+    if(e.key==="Enter"){e.preventDefault();sendComment(p.id,e.target);}
+  });
+  return div;
+}
+
+async function toggleLike(p){
+  const uid=CU.uid, ref=db.ref("posts/"+p.id);
+  const snap=await ref.once("value"); const d=snap.val(); if(!d)return;
+  const lb=d.likedBy||{};
+  if(lb[uid]){delete lb[uid]; await ref.update({likes:Math.max((d.likes||1)-1,0),likedBy:lb});}
+  else{lb[uid]=true; await ref.update({likes:(d.likes||0)+1,likedBy:lb});}
+}
+
+async function delPost(id){
+  if(!confirm("Delete this post?"))return;
+  await db.ref("posts/"+id).remove();
+  await db.ref("comments/"+id).remove();
+  toast("Post deleted","success");
+}
+
+// ── COMMENTS ──
+function toggleComments(pid){
+  const cs=G("cs-"+pid); if(!cs)return;
+  const open=cs.classList.toggle("open");
+  if(open) loadComments(pid);
+}
+
+let commentListeners={};
+function loadComments(pid){
+  const clist=G("clist-"+pid); if(!clist)return;
+  if(commentListeners[pid]) db.ref("comments/"+pid).off("value",commentListeners[pid]);
+  commentListeners[pid]=db.ref("comments/"+pid).orderByChild("at").on("value",snap=>{
+    clist.innerHTML="";
+    snap.forEach(c=>{
+      const cm=c.val();
+      const d=document.createElement("div"); d.className="comment-item";
+      d.innerHTML=`<div class="av sm">${cm.photoURL?`<img src="${cm.photoURL}"/>`:avatarL(cm.author)}</div>
+        <div class="comment-bubble">
+          <div class="comment-author">${esc(cm.author||"User")}</div>
+          <div class="comment-text">${esc(cm.text)}</div>
+          <div class="comment-time">${timeAgo(cm.at)}</div>
+        </div>`;
+      clist.appendChild(d);
+    });
+  });
+}
+
+async function sendComment(pid,inp){
+  const txt=inp.value.trim(); if(!txt)return;
+  inp.value="";
+  const ref=db.ref("comments/"+pid).push();
+  await ref.set({uid:CU.uid,author:CU.displayName||CU.email||"User",photoURL:CU.photoURL||"",text:txt,at:Date.now()});
+  // update comment count on post
+  const snap=await db.ref("posts/"+pid+"/comments").once("value");
+  await db.ref("posts/"+pid+"/comments").set((snap.val()||0)+1);
+}
+
+// ──────────────────────────────────────────
+//  CHAT ROOMS — FIXED: proper listener mgmt
+// ──────────────────────────────────────────
+function loadRooms(){
+  if(!db)return;
+  const list=G("rooms-list"); if(!list)return;
+  db.ref("rooms").on("value",snap=>{
+    list.innerHTML="";
+    if(!snap.exists()){list.innerHTML='<div class="empty-state">No rooms yet. Create one!</div>';return;}
+    snap.forEach(c=>{
+      const r=c.val(), row=document.createElement("div");
+      row.className="room-row"+(activeRoomId===r.id?" active":"");
+      row.innerHTML=`<div class="room-icon"><i class="fa-solid fa-hashtag"></i></div>
+        <div class="room-meta"><div class="room-name">${esc(r.name)}</div><div class="room-desc">${esc(r.desc||"Join the chat")}</div></div>
+        <div class="live-dot">LIVE</div>`;
+      row.addEventListener("click",()=>openRoom(r));
+      list.appendChild(row);
+    });
+  });
+}
+
+function openRoom(room){
+  activeRoomId=room.id;
+  // Mobile: hide panel, show chat
+  G("rooms-panel").style.display="none";
+  G("chat-win").classList.add("open");
+  G("chat-topbar").style.display="flex";
+  G("chat-msgs").style.display="flex";
+  G("chat-bar").style.display="flex";
+  const emp=document.querySelector(".chat-empty-state"); if(emp) emp.style.display="none";
+  G("room-name-display").textContent=room.name;
+
+  // Detach old listener
+  if(roomListener){ db.ref("messages/"+roomListener).off(); roomListener=null; }
+  roomListener=room.id;
+
+  const msgs=G("chat-msgs"); msgs.innerHTML="";
+
+  // FIXED: use .on("child_added") so each message appends without clearing
+  db.ref("messages/"+room.id).limitToLast(80).on("child_added",snap=>{
+    const msg=snap.val();
+    msgs.appendChild(buildChatMsg(msg));
+    msgs.scrollTop=msgs.scrollHeight;
+  });
+
+  db.ref("rooms/"+room.id+"/online").on("value",snap=>{
+    const el=G("room-members-display"); if(el) el.textContent=(snap.val()||1)+" online";
+  });
+  db.ref("rooms/"+room.id+"/online").set((db.ref("rooms/"+room.id+"/online").val||0)+1);
+}
+
+function buildChatMsg(msg){
+  const me=msg.uid===CU.uid, d=document.createElement("div");
+  d.className="chat-msg"+(me?" me":"");
+  d.innerHTML=`<div class="av sm">${msg.photoURL?`<img src="${msg.photoURL}"/>`:avatarL(msg.author)}</div>
+    <div>${!me?`<div class="msg-name">${esc(msg.author||"User")}</div>`:""}<div class="bubble">${esc(msg.text)}</div><div class="msg-time">${timeAgo(msg.at)}</div></div>`;
+  return d;
+}
+
+async function sendChat(){
+  const inp=G("chat-in"),txt=inp.value.trim(); if(!txt||!activeRoomId)return;
+  inp.value="";
+  await db.ref("messages/"+activeRoomId).push({
+    uid:CU.uid,author:CU.displayName||CU.email||"User",
+    photoURL:CU.photoURL||"",text:txt,at:Date.now()
+  });
+}
+
+// ──────────────────────────────────────────
+//  AI — Groq with fallback
+// ──────────────────────────────────────────
+async function sendAI(){
+  const inp=G("ai-in"),txt=inp.value.trim(); if(!txt)return;
+  inp.value=""; appendAI("user",txt); aiHistory.push({role:"user",content:txt});
+  const typing=document.createElement("div");
+  typing.className="ai-msg bot"; typing.id="ai-typing";
+  typing.innerHTML=`<div class="ai-av"><i class="fa-solid fa-robot"></i></div><div class="ai-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+  G("ai-msgs").appendChild(typing); scrollAI();
+
+  try{
+    const res=await fetch("https://api.groq.com/openai/v1/chat/completions",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","Authorization":"Bearer "+GROQ_KEY},
+      body:JSON.stringify({model:GROQ_MODEL,messages:aiHistory,max_tokens:1000,temperature:0.7})
+    });
+    if(!res.ok) throw new Error("Groq API error "+res.status);
+    const data=await res.json();
+    const reply=data.choices?.[0]?.message?.content||"I couldn't get a response. Try again!";
+    aiHistory.push({role:"assistant",content:reply});
+    const t=G("ai-typing"); if(t)t.remove();
+    appendAI("bot",reply);
+  }catch(err){
+    const t=G("ai-typing"); if(t)t.remove();
+    // Fallback smart responses
+    const fallbacks={
+      "who created you":"I was created by OX-Bridge Technology, founded by Goodnews Solomon. I'm the official AI of RealChat Live! 🤖",
+      "hello":"Hey there! 👋 How can I help you today?",
+      "hi":"Hi! 😊 What's on your mind?",
+      "how are you":"I'm doing great and ready to help! What can I do for you? ⚡",
+      "what is realchat":"RealChat Live is a social platform built by OX-Bridge Technology, founded by Goodnews Solomon. You can post, chat in rooms, follow people and talk to me! 🚀",
+    };
+    const lower=txt.toLowerCase();
+    let rep="⚠️ I'm having connection issues right now. Please check your internet and try again.";
+    for(const k in fallbacks){ if(lower.includes(k)){ rep=fallbacks[k]; break; } }
+    appendAI("bot",rep);
+  }
+}
+
+function appendAI(role,text){
+  const msgs=G("ai-msgs"), d=document.createElement("div");
+  d.className="ai-msg "+(role==="user"?"user":"bot");
+  d.innerHTML=role==="user"
+    ?`<div class="av sm">${avatarL(CU?(CU.displayName||CU.email):"U")}</div><div class="ai-bubble">${esc(text)}</div>`
+    :`<div class="ai-av"><i class="fa-solid fa-robot"></i></div><div class="ai-bubble">${esc(text)}</div>`;
+  msgs.appendChild(d); scrollAI();
+}
+function scrollAI(){ const m=G("ai-msgs"); if(m) m.scrollTop=m.scrollHeight; }
+
+// ──────────────────────────────────────────
+//  PEOPLE / FOLLOW
+// ──────────────────────────────────────────
+function loadPeople(){
+  if(!db)return;
+  db.ref("users").on("value",snap=>{
+    allUsers={};
+    snap.forEach(c=>{ allUsers[c.key]=c.val(); });
+    filterPeople("");
+  });
+}
+
+function filterPeople(q){
+  const list=G("people-list"); if(!list)return;
+  const lower=q.toLowerCase();
+  const users=Object.entries(allUsers).filter(([uid,u])=>{
+    if(uid===CU.uid)return false;
+    if(!q)return true;
+    return (u.name||"").toLowerCase().includes(lower)||(u.email||"").toLowerCase().includes(lower);
+  });
+  if(!users.length){ list.innerHTML='<div class="empty-state"><i class="fa-solid fa-users"></i>No users found</div>'; return; }
+  list.innerHTML="";
+  users.forEach(([uid,u])=>{
+    const card=document.createElement("div"); card.className="person-card";
+    card.innerHTML=`
+      <div class="av">${u.photoURL?`<img src="${u.photoURL}"/>`:avatarL(u.name||u.email)}</div>
+      <div class="person-info"><div class="person-name">${esc(u.name||"User")}</div><div class="person-email">${esc(u.email||"")}</div></div>
+      <button class="follow-btn" id="fb-${uid}">Follow</button>`;
+    // Check follow status
+    db.ref("follows/"+CU.uid+"/"+uid).once("value",s=>{
+      const fb=G("fb-"+uid); if(!fb)return;
+      if(s.exists()){ fb.textContent="Following"; fb.classList.add("following"); }
+    });
+    card.querySelector(".follow-btn").addEventListener("click",async e=>{
+      const fb=e.target;
+      const fref=db.ref("follows/"+CU.uid+"/"+uid);
+      const snap=await fref.once("value");
+      if(snap.exists()){
+        await fref.remove();
+        await db.ref("followers/"+uid+"/"+CU.uid).remove();
+        fb.textContent="Follow"; fb.classList.remove("following");
+        toast("Unfollowed","");
+      } else {
+        await fref.set(true);
+        await db.ref("followers/"+uid+"/"+CU.uid).set(true);
+        fb.textContent="Following"; fb.classList.add("following");
+        toast("Following "+u.name+"! 👥","success");
+      }
+    });
+    list.appendChild(card);
+  });
+}
+
+// ──────────────────────────────────────────
+//  PROFILE
+// ──────────────────────────────────────────
+function loadProfile(){
+  if(!CU)return;
+  const n=CU.displayName||CU.email||"User";
+  G("profile-name").textContent=n;
+  G("profile-email").textContent=CU.email||"";
+  setAv(G("profile-av"),CU);
+  // Stats
+  db.ref("posts").orderByChild("uid").equalTo(CU.uid).once("value",snap=>{
+    G("stat-posts").textContent=snap.numChildren();
+    const pl=G("profile-posts"); if(!pl)return;
+    const posts=[]; snap.forEach(c=>posts.unshift(c.val()));
+    if(!posts.length){ pl.innerHTML='<div class="empty-state"><i class="fa-regular fa-face-smile"></i>No posts yet</div>'; return; }
+    pl.innerHTML=""; posts.forEach(p=>pl.appendChild(buildPost(p)));
+  });
+  db.ref("followers/"+CU.uid).once("value",s=>{ G("stat-followers").textContent=s.numChildren(); });
+  db.ref("follows/"+CU.uid).once("value",s=>{ G("stat-following").textContent=s.numChildren(); });
+}
+
+// ──────────────────────────────────────────
+//  ADMIN DASHBOARD
+// ──────────────────────────────────────────
+function loadAdmin(){
+  if(!CU||CU.email!==ADMIN_EMAIL)return;
+  db.ref("users").once("value",s=>{
+    G("admin-total-users").textContent=s.numChildren();
+    const ul=G("admin-users-list"); ul.innerHTML="";
+    s.forEach(c=>{
+      const u=c.val(), uid=c.key;
+      const row=document.createElement("div"); row.className="user-row";
+      row.innerHTML=`<div class="av sm">${u.photoURL?`<img src="${u.photoURL}"/>`:avatarL(u.name||u.email)}</div>
+        <div class="user-row-info"><div class="user-row-name">${esc(u.name||"User")}</div><div class="user-row-email">${esc(u.email||"")}</div></div>
+        <button class="btn-danger ban-btn" data-uid="${uid}"><i class="fa-solid fa-ban"></i></button>`;
+      row.querySelector(".ban-btn").addEventListener("click",async e=>{
+        if(!confirm("Remove this user's data?"))return;
+        await db.ref("users/"+uid).remove();
+        toast("User removed","success"); loadAdmin();
+      });
+      ul.appendChild(row);
+    });
+  });
+  db.ref("posts").once("value",s=>{
+    G("admin-total-posts").textContent=s.numChildren();
+    const pl=G("admin-posts-list"); pl.innerHTML="";
+    const posts=[]; s.forEach(c=>posts.unshift(c.val()));
+    posts.slice(0,20).forEach(p=>{
+      const row=document.createElement("div"); row.className="user-row";
+      row.innerHTML=`<div class="av sm">${avatarL(p.author)}</div>
+        <div class="user-row-info"><div class="user-row-name">${esc(p.author)}</div><div class="user-row-email">${esc((p.text||"[image]").slice(0,50))}</div></div>
+        <button class="btn-danger" onclick="adminDelPost('${p.id}')"><i class="fa-solid fa-trash"></i></button>`;
+      pl.appendChild(row);
+    });
+  });
+  db.ref("rooms").once("value",s=>G("admin-total-rooms").textContent=s.numChildren());
+  db.ref("messages").once("value",s=>{
+    let total=0; s.forEach(c=>total+=c.numChildren());
+    G("admin-total-msgs").textContent=total;
+  });
+}
+
+async function adminDelPost(id){
+  if(!confirm("Delete this post?"))return;
+  await db.ref("posts/"+id).remove();
+  await db.ref("comments/"+id).remove();
+  toast("Post deleted by admin","success"); loadAdmin();
+}
+</script>
+</body>
+</html>
